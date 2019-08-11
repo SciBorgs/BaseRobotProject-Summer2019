@@ -11,4 +11,6 @@ public class Point implements Serializable {
         this.x = x;
         this.y = y;
     }
+
+    // TODO: Implement comparison & hashing methods
 }
