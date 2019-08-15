@@ -8,16 +8,15 @@ public class Edge {
     public Edge nextOrigin; // Shares the origin & is counterclockwise to the edge.
     public Edge symEdge;    // Same edge, but points in the opposite direction.
     
-    //                         * <- dest
+    //                         * <- dest / symEdge.origin
     //                         |
     //                         |
     //                         |
-    //                         * <- origin / symEdge.origin
-    //                       / | \
-    //                      /  |  \
-    //                     /   |   \
-    // nextOrigin.dest -> *    *    * <- prevOrigin.dest
-    //                         |-------- symEdge.dest
+    //                         * <- origin / symEdge.dest
+    //                       /   \
+    //                      /     \
+    //                     /       \
+    // nextOrigin.dest -> *         * <- prevOrigin.dest
 
     public Edge(Point origin, Point dest) {
         this.origin = origin;
