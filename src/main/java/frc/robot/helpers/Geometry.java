@@ -3,8 +3,8 @@ package frc.robot.helpers;
 import java.util.Optional;
 
 public class Geometry {
-
     public static final Point ORIGIN = new Point(0, 0);
+    private static final double EPSILON = 1e-9;
 
     public static Point rotatePoint(Point point, Point pointToRotateAround, double radiansToRotate) {
         double tempX = point.x - pointToRotateAround.x;
@@ -38,5 +38,9 @@ public class Geometry {
         Optional<Point> intersection = getIntersection(getPerpendicular(line, point), line);
         // Intersection will never be empty in this case
         return getDistance(point, intersection.get());
+    }
+
+    public static boolean isCollinear(Point p1, Point p2, Point p3) {
+        return (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y) <= EPSILON;
     }
 }

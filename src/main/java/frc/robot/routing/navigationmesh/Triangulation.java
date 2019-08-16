@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.function.Function;
 
+import frc.robot.helpers.Geometry;
 import frc.robot.helpers.Point;
 
 public class Triangulation {
     private HashSet<Point> points;
-    private double EPSILON = 1e-9;
     private List<Edge> triangulatedEdges;
 
     public Triangulation(HashSet<Point> points) {
@@ -28,11 +30,11 @@ public class Triangulation {
         Comparator<Point> comparator = Comparator.comparing(p -> p.x);
         comparator.thenComparing(Comparator.comparing(p -> p.y));
         sortedPoints.sort(comparator);
-        divideAndConquer(sortedPoints);
+        divideAndConquer(sortedPoints, 0);
         return triangulatedEdges;
     }
 
-    private void divideAndConquer(List<Point> points) {
+    private void divideAndConquer(List<Point> points, int depth) {
         if (points.size() == 2) {
             createEdge(points.get(0), points.get(1));
         } else if (points.size() == 3) {
@@ -40,14 +42,15 @@ public class Triangulation {
             Point p2 = points.get(1);
             Point p3 = points.get(2);
 
-            Edge left = createEdge(p1, p2);
-            Edge right = createEdge(p2, p3);
-            if (!isCollinear(p1, p2, p3)) {
-                combine(left.symEdge, right);
-                connectEdges(left, right);
+            Edge leftEdge = createEdge(p1, p2);
+            Edge rightEdge = createEdge(p2, p3);
+            if (!Geometry.isCollinear(p1, p2, p3)) {
+                join(leftEdge.symEdge.prevOrigin, rightEdge);
+                connectEdges(leftEdge, rightEdge);
             }
+        } else {
+            // TODO: Alternate between horizontal & vertical hyperplanes
         }
-        // ...
     }
 
     // NOTE: Take a look at Edge.java::11-20 for a visualization
@@ -64,8 +67,8 @@ public class Triangulation {
         return edge;
     }
 
-    private void combine(Edge e1, Edge e2) {
-        // Think of the edges as cirular list nodes; splicing them should
+    private void join(Edge e1, Edge e2) {
+        // Think of the edges as cirular list nodes; joining them should
         // maintain the structure & remain circular.
         if (e1.origin != e2.origin) {
             e1.nextOrigin.prevOrigin = e2;
@@ -78,12 +81,25 @@ public class Triangulation {
 
     private Edge connectEdges(Edge e1, Edge e2) {
         Edge connectingEdge = createEdge(e2.dest, e1.origin);
-        combine(e2.symEdge.prevOrigin, connectingEdge);
-        combine(connectingEdge.symEdge, e1);
+        // left(e1) == left(connectingEdge) == left(e2) 
+        join(e2.symEdge.prevOrigin, connectingEdge);
+        join(connectingEdge.symEdge.prevOrigin, e1);
         return connectingEdge;
-    } 
+    }
 
-    private boolean isCollinear(Point p1, Point p2, Point p3) {
-        return (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y) <= EPSILON;
+    private Point getSplittingPoint(List<Point> list, int k, Function<Point, Double> axisComparator) {
+        // Maybe replace random with median-of-medians
+        Point pivot = list.get(new Random().nextInt(list.size()));
+        List<Point> lesser  = new ArrayList<>();
+        List<Point> greater = new ArrayList<>();
+        for (Point elem: list) {
+            double elemAxis = axisComparator.apply(elem);
+            double pivotAxis = axisComparator.apply(pivot);
+            if (elemAxis < pivotAxis){lesser.add(elem);}
+            else{greater.add(elem);}
+        }
+        if (k < lesser.size()){return getSplittingPoint(lesser, k, axisComparator);}
+        else if (k < lesser.size() + 1){return pivot;}
+        else{return getSplittingPoint(greater, k - lesser.size() - 1, axisComparator);}
     }
 }

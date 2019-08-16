@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DigitalOutput;
 
 import java.util.*;
-import java.util.Collections;
 
 // FILE HAS NOT BEEN CLEANED UP //
 public class Utils{
@@ -21,7 +20,7 @@ public class Utils{
 
     public static<T> T last(ArrayList<T> arr) {return arr.get(arr.size() - 1);}
 
-    public static int signOf(double value){
+    public static int signOf(double value) {
         if (value == 0){
             return 0;
         } else {
@@ -34,11 +33,11 @@ public class Utils{
         while (maxSize < arr.size()){arr.remove(0);}
     }
 
-    public static boolean inRange(double n1, double n2, double error){
+    public static boolean inRange(double n1, double n2, double error) {
         return Math.abs(n1 - n2) < error;
     }
 
-    public static boolean inRange(ArrayList<Double> arr, double error){
+    public static boolean inRange(ArrayList<Double> arr, double error) {
         return inRange(Collections.max(arr), Collections.min(arr), error);
     }
 
@@ -52,7 +51,7 @@ public class Utils{
         trimIf(arr, maxSize);
     }
 
-    public static double limitOutput(double output, double max){
+    public static double limitOutput(double output, double max) {
         if (output > max) {
             return max;
         } else if (output < - max) {
@@ -62,7 +61,7 @@ public class Utils{
         }
     }
 
-    public static void setTalon(TalonSRX talon, double speed){
+    public static void setTalon(TalonSRX talon, double speed) {
         talon.set(ControlMode.PercentOutput, speed);
     }
 
@@ -74,7 +73,7 @@ public class Utils{
         }
     }
 
-    public static HashSet<String> arrayListToHashset(ArrayList<String> values){
+    public static HashSet<String> arrayListToHashset(ArrayList<String> values) {
         HashSet<String> end = new HashSet<String>();
         for (String val : values){
             end.add(val);
@@ -82,7 +81,7 @@ public class Utils{
         return end;
     }
 
-    public static Hashtable<String,String> hatshtableDataToString(Hashtable<String,Object> hashTable){
+    public static Hashtable<String,String> hashtableDataToString(Hashtable<String,Object> hashTable) {
         Hashtable<String,String> end = new Hashtable<String,String>();
         for (String key : hashTable.keySet()){
             end.put(key,hashTable.get(key).toString());
@@ -97,7 +96,7 @@ public class Utils{
 	    return result;
     }
 
-    public static Value oppositeDoubleSolenoidValue(Value val){
+    public static Value oppositeDoubleSolenoidValue(Value val) {
         switch (val) {
             case kForward: return Value.kReverse;
             case kReverse: return Value.kForward;
@@ -105,20 +104,21 @@ public class Utils{
         return Value.kOff;
     }
 
-    public static void toggleDoubleSolenoid(DoubleSolenoid doubleSolenoid){
+    public static void toggleDoubleSolenoid(DoubleSolenoid doubleSolenoid) {
         doubleSolenoid.set(oppositeDoubleSolenoidValue(doubleSolenoid.get()));
     }
 
     public static boolean oppositeDigitalOutput(boolean bool){return !bool;}
 
-    public static void toggleDigitalOutput(DigitalOutput digitalOutput){
+    public static void toggleDigitalOutput(DigitalOutput digitalOutput) {
         oppositeDigitalOutput(digitalOutput.get());
     }
 
-    public static DoubleSolenoid newDoubleSolenoid(int[] ports){
+    public static DoubleSolenoid newDoubleSolenoid(int[] ports) {
         return new DoubleSolenoid(ports[0], ports[1]);
     }
-    public static DoubleSolenoid newDoubleSolenoid(int pdpPort, int[] ports){
+    
+    public static DoubleSolenoid newDoubleSolenoid(int pdpPort, int[] ports) {
         return new DoubleSolenoid(pdpPort, ports[0], ports[1]);
     }
 }
