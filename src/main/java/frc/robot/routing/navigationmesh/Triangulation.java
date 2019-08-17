@@ -8,7 +8,9 @@ import java.util.Random;
 import java.util.function.Function;
 
 import frc.robot.helpers.Geometry;
+import frc.robot.helpers.Pair;
 import frc.robot.helpers.Point;
+import frc.robot.helpers.Geometry.Orientation;
 
 public class Triangulation {
     private HashSet<Point> points;
@@ -28,28 +30,52 @@ public class Triangulation {
     public List<Edge> triangulate() {
         List<Point> sortedPoints = new ArrayList<>(points);
         Comparator<Point> comparator = Comparator.comparing(p -> p.x);
-        comparator.thenComparing(Comparator.comparing(p -> p.y));
+        comparator.thenComparing(Comparator.comparing(p -> p.y)); // Let the y axis be the tiebreaker in case of equal x axes
         sortedPoints.sort(comparator);
         divideAndConquer(sortedPoints, 0);
         return triangulatedEdges;
     }
 
-    private void divideAndConquer(List<Point> points, int depth) {
+    private Pair<Edge, Edge> divideAndConquer(List<Point> points, int depth) {
         if (points.size() == 2) {
-            createEdge(points.get(0), points.get(1));
+            Edge edge = createEdge(points.get(0), points.get(1));
+            return new Pair<Edge, Edge>(edge, edge.symEdge);
         } else if (points.size() == 3) {
-            Point p1 = points.get(0);
-            Point p2 = points.get(1);
-            Point p3 = points.get(2);
+            Edge e1 = createEdge(points.get(0), points.get(1));
+            Edge e2 = createEdge(points.get(1), points.get(2));
 
-            Edge leftEdge = createEdge(p1, p2);
-            Edge rightEdge = createEdge(p2, p3);
-            if (!Geometry.isCollinear(p1, p2, p3)) {
-                join(leftEdge.symEdge.prevOrigin, rightEdge);
-                connectEdges(leftEdge, rightEdge);
+            if (Geometry.getOrientation(points.get(2), e1) == Orientation.Right) {
+                connectEdges(e2, e1);
+                return new Pair<Edge,Edge>(e1, e2.symEdge);
+            } else if (Geometry.getOrientation(points.get(2), e1) == Orientation.Left) {
+                Edge connectingEdge = connectEdges(e2, e1);
+                return new Pair<Edge, Edge>(connectingEdge.symEdge, connectingEdge);
+            } else {
+                return new Pair<Edge,Edge>(e1, e2.symEdge);
             }
         } else {
-            // TODO: Alternate between horizontal & vertical hyperplanes
+            Point splittingPoint;
+            if (depth == 0) {
+                splittingPoint = points.get(Math.floorDiv(points.size(), 2));
+            } else {
+                splittingPoint = depth % 2 == 0 
+                                 ? getSplittingPoint(points, Math.floorDiv(points.size(), 2), p -> p.x)
+                                 : getSplittingPoint(points, Math.floorDiv(points.size(), 2), p -> p.y);
+            }
+            List<Point> leftList = points.subList(0, points.indexOf(splittingPoint));
+            List<Point> rightList = points.subList(points.indexOf(splittingPoint), points.size());
+            Pair<Edge, Edge> leftHandles = divideAndConquer(leftList, depth + 1);
+            Pair<Edge, Edge> rightHandles = divideAndConquer(rightList, depth + 1);
+            Edge ldo = leftHandles.first;  Edge ldi = leftHandles.second;
+            Edge rdi = rightHandles.first; Edge rdo = rightHandles.second;
+
+            // TODO: Rotate handles to account for alternating hyperplanes
+
+            while(true) {
+                if (Geometry.getOrientation(rdi.origin, ldi) == Orientation.Left){ldi = ldi.symEdge.nextOrigin;}
+                else if (Geometry.getOrientation(ldi.origin, rdi) == Orientation.Right){rdi = rdi.symEdge.prevOrigin;}
+                else{break;}
+            }
         }
     }
 
@@ -93,7 +119,7 @@ public class Triangulation {
         List<Point> lesser  = new ArrayList<>();
         List<Point> greater = new ArrayList<>();
         for (Point elem: list) {
-            double elemAxis = axisComparator.apply(elem);
+            double elemAxis  = axisComparator.apply(elem);
             double pivotAxis = axisComparator.apply(pivot);
             if (elemAxis < pivotAxis){lesser.add(elem);}
             else{greater.add(elem);}
