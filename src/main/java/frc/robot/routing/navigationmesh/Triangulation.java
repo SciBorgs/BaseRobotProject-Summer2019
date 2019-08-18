@@ -76,7 +76,7 @@ public class Triangulation {
             Edge ldo = leftHandles.first;  Edge rdi = rightHandles.first;
             Edge ldi = leftHandles.second; Edge rdo = rightHandles.second;
 
-            while(true) {
+            while (true) {
                 if (Geometry.getOrientation(rdi.origin, ldi) == Orientation.Left){ldi = ldi.symEdge.nextOrigin;}
                 else if (Geometry.getOrientation(ldi.origin, rdi) == Orientation.Right){rdi = rdi.symEdge.prevOrigin;}
                 else{break;}
@@ -84,6 +84,12 @@ public class Triangulation {
             Edge base = createConnectingEdge(rdi.symEdge, ldi);
             if (ldi.origin == ldo.origin){ldo = base.symEdge;}
             if (rdi.origin == rdo.origin){rdo = base;}
+            while (true) {
+                Edge leftCand = base.symEdge.nextOrigin;
+                if (Geometry.getOrientation(leftCand.dest, base) == Orientation.Right) {
+                    // TODO: Delete edges in circle
+                }
+            }
         }
     }
 
@@ -144,5 +150,24 @@ public class Triangulation {
         while (le.origin.y > le.symEdge.prevOrigin.origin.y){le = le.symEdge.prevOrigin;}
         while (re.origin.y < re.symEdge.nextOrigin.origin.y){re = re.symEdge.nextOrigin;}
         return new Pair<Edge,Edge>(le, re);
+    }
+
+    private boolean isPointInCircle(Point p1, Point p2, Point p3, Point pointToTest) {
+        double p1dx = p1.x - pointToTest.x;
+        double p1dy = p1.y - pointToTest.y;
+        double p2dx = p2.x - pointToTest.x;
+        double p2dy = p2.y - pointToTest.y;
+        double p3dx = p3.x - pointToTest.x;
+        double p3dy = p3.y - pointToTest.y;
+
+        double p1p2Det = p1dx * p2dy - p2dx * p1dy;
+        double p2p3Det = p2dx * p3dy - p3dx * p2dy;
+        double p3p1Det = p3dx * p1dy - p1dx * p3dy;
+        
+        double p1Lift = Math.pow(p1dx, 2) + Math.pow(p1dy, 2);
+        double p2Lift = Math.pow(p2dx, 2) + Math.pow(p2dy, 2);
+        double p3Lift = Math.pow(p3dx, 2) + Math.pow(p3dy, 2);
+
+        return p1Lift * p2p3Det + p2Lift * p3p1Det + p3Lift * p1p2Det > 0;
     }
 }
