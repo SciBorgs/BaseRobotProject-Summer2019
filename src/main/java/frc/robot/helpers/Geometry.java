@@ -47,7 +47,7 @@ public class Geometry {
     }
 
     public static enum Orientation { Left, Right, Collinear }
-    
+
     public static Orientation getOrientation(Point point, Edge edge) {
         double determinant = (edge.dest.x - edge.origin.x) * (point.y - edge.origin.y) - (point.x - edge.origin.x) * (edge.dest.y - edge.origin.y);
         if (determinant < 0){return Orientation.Right;}

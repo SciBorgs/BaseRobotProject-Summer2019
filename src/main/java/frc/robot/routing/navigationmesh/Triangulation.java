@@ -44,11 +44,11 @@ public class Triangulation {
             Edge e1 = createEdge(points.get(0), points.get(1));
             Edge e2 = createEdge(points.get(1), points.get(2));
 
-            if (Geometry.getOrientation(points.get(2), e1) == Orientation.Right) {
-                connectEdges(e2, e1);
+            if (Geometry.getOrientation(points.get(2), e1) == Orientation.Left) {
+                createConnectingEdge(e2, e1);
                 return new Pair<Edge,Edge>(e1, e2.symEdge);
-            } else if (Geometry.getOrientation(points.get(2), e1) == Orientation.Left) {
-                Edge connectingEdge = connectEdges(e2, e1);
+            } else if (Geometry.getOrientation(points.get(2), e1) == Orientation.Right) {
+                Edge connectingEdge = createConnectingEdge(e2, e1);
                 return new Pair<Edge, Edge>(connectingEdge.symEdge, connectingEdge);
             } else {
                 return new Pair<Edge,Edge>(e1, e2.symEdge);
@@ -62,20 +62,28 @@ public class Triangulation {
                                  ? getSplittingPoint(points, Math.floorDiv(points.size(), 2), p -> p.x)
                                  : getSplittingPoint(points, Math.floorDiv(points.size(), 2), p -> p.y);
             }
-            List<Point> leftList = points.subList(0, points.indexOf(splittingPoint));
-            List<Point> rightList = points.subList(points.indexOf(splittingPoint), points.size());
-            Pair<Edge, Edge> leftHandles = divideAndConquer(leftList, depth + 1);
-            Pair<Edge, Edge> rightHandles = divideAndConquer(rightList, depth + 1);
-            Edge ldo = leftHandles.first;  Edge ldi = leftHandles.second;
-            Edge rdi = rightHandles.first; Edge rdo = rightHandles.second;
-
-            // TODO: Rotate handles to account for alternating hyperplanes
+            Pair<Edge, Edge> leftHandles = divideAndConquer(points.subList(0, 
+                                                            points.indexOf(splittingPoint)),
+                                                            depth + 1);
+            Pair<Edge, Edge> rightHandles = divideAndConquer(points.subList(points.indexOf(splittingPoint), 
+                                                             points.size()), 
+                                                             depth + 1);
+            
+            if (depth % 2 != 0) {
+                leftHandles  = adjustHandlesY(leftHandles);
+                rightHandles = adjustHandlesY(rightHandles);
+            }
+            Edge ldo = leftHandles.first;  Edge rdi = rightHandles.first;
+            Edge ldi = leftHandles.second; Edge rdo = rightHandles.second;
 
             while(true) {
                 if (Geometry.getOrientation(rdi.origin, ldi) == Orientation.Left){ldi = ldi.symEdge.nextOrigin;}
                 else if (Geometry.getOrientation(ldi.origin, rdi) == Orientation.Right){rdi = rdi.symEdge.prevOrigin;}
                 else{break;}
             }
+            Edge base = createConnectingEdge(rdi.symEdge, ldi);
+            if (ldi.origin == ldo.origin){ldo = base.symEdge;}
+            if (rdi.origin == rdo.origin){rdo = base;}
         }
     }
 
@@ -105,7 +113,7 @@ public class Triangulation {
         }
     }
 
-    private Edge connectEdges(Edge e1, Edge e2) {
+    private Edge createConnectingEdge(Edge e1, Edge e2) {
         Edge connectingEdge = createEdge(e2.dest, e1.origin);
         // left(e1) == left(connectingEdge) == left(e2) 
         join(e2.symEdge.prevOrigin, connectingEdge);
@@ -127,5 +135,14 @@ public class Triangulation {
         if (k < lesser.size()){return getSplittingPoint(lesser, k, axisComparator);}
         else if (k < lesser.size() + 1){return pivot;}
         else{return getSplittingPoint(greater, k - lesser.size() - 1, axisComparator);}
+    }
+
+    private Pair<Edge, Edge> adjustHandlesY(Pair<Edge, Edge> handle) {
+        Edge le = handle.first;
+        Edge re = handle.second;
+
+        while (le.origin.y > le.symEdge.prevOrigin.origin.y){le = le.symEdge.prevOrigin;}
+        while (re.origin.y < re.symEdge.nextOrigin.origin.y){re = re.symEdge.nextOrigin;}
+        return new Pair<Edge,Edge>(le, re);
     }
 }
