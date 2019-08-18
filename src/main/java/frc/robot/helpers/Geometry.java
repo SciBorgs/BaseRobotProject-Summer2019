@@ -46,12 +46,34 @@ public class Geometry {
         return (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y) <= EPSILON;
     }
 
-    public static enum Orientation { Left, Right, Collinear }
+    private static double getOrientation(Point point, Edge edge) {
+        return (edge.dest.x - edge.origin.x) * (point.y - edge.origin.y) - (point.x - edge.origin.x) * (edge.dest.y - edge.origin.y);
+    }
 
-    public static Orientation getOrientation(Point point, Edge edge) {
-        double determinant = (edge.dest.x - edge.origin.x) * (point.y - edge.origin.y) - (point.x - edge.origin.x) * (edge.dest.y - edge.origin.y);
-        if (determinant < 0){return Orientation.Right;}
-        if (determinant > 0){return Orientation.Left;}
-        return Orientation.Collinear;
+    public static boolean isRightOf(Point point, Edge edge) {
+        return getOrientation(point, edge) < 0;
+    }
+
+    public static boolean isLeftOf(Point point, Edge edge) {
+        return getOrientation(point, edge) > 0;
+    }
+
+    public static boolean isPointInCircle(Point p1, Point p2, Point p3, Point pointToTest) {
+        double p1dx = p1.x - pointToTest.x;
+        double p1dy = p1.y - pointToTest.y;
+        double p2dx = p2.x - pointToTest.x;
+        double p2dy = p2.y - pointToTest.y;
+        double p3dx = p3.x - pointToTest.x;
+        double p3dy = p3.y - pointToTest.y;
+
+        double p1p2Det = p1dx * p2dy - p2dx * p1dy;
+        double p2p3Det = p2dx * p3dy - p3dx * p2dy;
+        double p3p1Det = p3dx * p1dy - p1dx * p3dy;
+        
+        double p1Lift = Math.pow(p1dx, 2) + Math.pow(p1dy, 2);
+        double p2Lift = Math.pow(p2dx, 2) + Math.pow(p2dy, 2);
+        double p3Lift = Math.pow(p3dx, 2) + Math.pow(p3dy, 2);
+
+        return p1Lift * p2p3Det + p2Lift * p3p1Det + p3Lift * p1p2Det > 0;
     }
 }

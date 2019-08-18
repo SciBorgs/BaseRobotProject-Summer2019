@@ -1,5 +1,7 @@
 package frc.robot.routing.navigationmesh;
 
+import java.util.Objects;
+
 import frc.robot.helpers.Point;
 
 public class Edge {
@@ -25,5 +27,23 @@ public class Edge {
         prevOrigin = null;
         nextOrigin = null;
         symEdge    = null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Edge)) {
+            return false;
+        }
+        Edge edge = (Edge) o;
+        return Objects.equals(origin, edge.origin) && Objects.equals(dest, edge.dest)
+                && Objects.equals(prevOrigin, edge.prevOrigin) && Objects.equals(nextOrigin, edge.nextOrigin)
+                && Objects.equals(symEdge, edge.symEdge);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(origin, dest, prevOrigin, nextOrigin, symEdge);
     }
 }

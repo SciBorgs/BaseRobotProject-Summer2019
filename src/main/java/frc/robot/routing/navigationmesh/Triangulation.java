@@ -10,10 +10,9 @@ import java.util.function.Function;
 import frc.robot.helpers.Geometry;
 import frc.robot.helpers.Pair;
 import frc.robot.helpers.Point;
-import frc.robot.helpers.Geometry.Orientation;
 
 public class Triangulation {
-    private HashSet<Point> points;
+    private HashSet<Point> pointSet;
     private List<Edge> triangulatedEdges;
 
     public Triangulation(HashSet<Point> points) {
@@ -23,17 +22,17 @@ public class Triangulation {
         if (points.size() < 2) {
             throw new IllegalArgumentException("Triangulation requires AT LEAST 2 points");
         }
-        this.points = points;
-        triangulatedEdges = new ArrayList<>();
+        this.pointSet = points;
+        this.triangulatedEdges = new ArrayList<>();
     }
 
     public List<Edge> triangulate() {
-        List<Point> sortedPoints = new ArrayList<>(points);
+        List<Point> sortedPoints = new ArrayList<>(this.pointSet);
         Comparator<Point> comparator = Comparator.comparing(p -> p.x);
         comparator.thenComparing(Comparator.comparing(p -> p.y)); // Let the y axis be the tiebreaker in case of equal x axes
         sortedPoints.sort(comparator);
         divideAndConquer(sortedPoints, 0);
-        return triangulatedEdges;
+        return this.triangulatedEdges;
     }
 
     private Pair<Edge, Edge> divideAndConquer(List<Point> points, int depth) {
@@ -44,10 +43,10 @@ public class Triangulation {
             Edge e1 = createEdge(points.get(0), points.get(1));
             Edge e2 = createEdge(points.get(1), points.get(2));
 
-            if (Geometry.getOrientation(points.get(2), e1) == Orientation.Left) {
+            if (Geometry.isLeftOf(points.get(2), e1)) {
                 createConnectingEdge(e2, e1);
                 return new Pair<Edge,Edge>(e1, e2.symEdge);
-            } else if (Geometry.getOrientation(points.get(2), e1) == Orientation.Right) {
+            } else if (Geometry.isRightOf(points.get(2), e1)) {
                 Edge connectingEdge = createConnectingEdge(e2, e1);
                 return new Pair<Edge, Edge>(connectingEdge.symEdge, connectingEdge);
             } else {
@@ -77,19 +76,44 @@ public class Triangulation {
             Edge ldi = leftHandles.second; Edge rdo = rightHandles.second;
 
             while (true) {
-                if (Geometry.getOrientation(rdi.origin, ldi) == Orientation.Left){ldi = ldi.symEdge.nextOrigin;}
-                else if (Geometry.getOrientation(ldi.origin, rdi) == Orientation.Right){rdi = rdi.symEdge.prevOrigin;}
+                if (Geometry.isLeftOf(rdi.origin, ldi)){ldi = ldi.symEdge.nextOrigin;}
+                else if (Geometry.isRightOf(ldi.origin, rdi)){rdi = rdi.symEdge.prevOrigin;}
                 else{break;}
             }
             Edge base = createConnectingEdge(rdi.symEdge, ldi);
+
             if (ldi.origin == ldo.origin){ldo = base.symEdge;}
             if (rdi.origin == rdo.origin){rdo = base;}
             while (true) {
                 Edge leftCand = base.symEdge.nextOrigin;
-                if (Geometry.getOrientation(leftCand.dest, base) == Orientation.Right) {
-                    // TODO: Delete edges in circle
+                boolean isLeftCandValid = Geometry.isRightOf(leftCand.dest, base);
+
+                if (isLeftCandValid) {
+                    while (Geometry.isPointInCircle(base.dest, base.origin, 
+                                                    leftCand.dest, leftCand.nextOrigin.dest)) {
+                        Edge temp = leftCand.nextOrigin;
+                        deleteEdge(leftCand);
+                        leftCand = temp;
+                    }
                 }
+                Edge rightCand = base.prevOrigin;
+                boolean isRightCandValid = Geometry.isRightOf(rightCand.dest, base);
+
+                if (isRightCandValid) {
+                    while (Geometry.isPointInCircle(base.dest, base.origin, 
+                                                    rightCand.dest, rightCand.prevOrigin.dest)) {
+                        Edge temp = rightCand.prevOrigin;
+                        deleteEdge(rightCand);
+                        rightCand = temp;
+                    }
+                }
+                if (!isLeftCandValid && !isRightCandValid){break;}
+                if (!isLeftCandValid || (isRightCandValid && Geometry.isPointInCircle(leftCand.dest, leftCand.origin, 
+                                                                                      rightCand.origin, rightCand.dest))) {
+                    base = createConnectingEdge(rightCand, base.symEdge);
+                } else{base = createConnectingEdge(base.symEdge, leftCand.symEdge);}
             }
+            return new Pair<Edge,Edge>(ldo, rdo);
         }
     }
 
@@ -103,12 +127,12 @@ public class Triangulation {
         edge.symEdge = symEdge;
         symEdge.symEdge = edge;
 
-        triangulatedEdges.add(edge);
+        this.triangulatedEdges.add(edge);
         return edge;
     }
 
-    private void join(Edge e1, Edge e2) {
-        // Think of the edges as cirular list nodes; joining them should
+    private void splice(Edge e1, Edge e2) {
+        // Think of the edges as cirular list nodes; splicing them should
         // maintain the structure & remain circular.
         if (e1.origin != e2.origin) {
             e1.nextOrigin.prevOrigin = e2;
@@ -119,11 +143,18 @@ public class Triangulation {
         }
     }
 
+    private void deleteEdge(Edge e) {
+        splice(e, e.prevOrigin);
+        splice(e.symEdge, e.symEdge.prevOrigin);
+        this.triangulatedEdges.remove(e);
+        this.triangulatedEdges.remove(e.symEdge);
+    }
+
     private Edge createConnectingEdge(Edge e1, Edge e2) {
         Edge connectingEdge = createEdge(e2.dest, e1.origin);
         // left(e1) == left(connectingEdge) == left(e2) 
-        join(e2.symEdge.prevOrigin, connectingEdge);
-        join(connectingEdge.symEdge.prevOrigin, e1);
+        splice(e2.symEdge.prevOrigin, connectingEdge);
+        splice(connectingEdge.symEdge.prevOrigin, e1);
         return connectingEdge;
     }
 
@@ -150,24 +181,5 @@ public class Triangulation {
         while (le.origin.y > le.symEdge.prevOrigin.origin.y){le = le.symEdge.prevOrigin;}
         while (re.origin.y < re.symEdge.nextOrigin.origin.y){re = re.symEdge.nextOrigin;}
         return new Pair<Edge,Edge>(le, re);
-    }
-
-    private boolean isPointInCircle(Point p1, Point p2, Point p3, Point pointToTest) {
-        double p1dx = p1.x - pointToTest.x;
-        double p1dy = p1.y - pointToTest.y;
-        double p2dx = p2.x - pointToTest.x;
-        double p2dy = p2.y - pointToTest.y;
-        double p3dx = p3.x - pointToTest.x;
-        double p3dy = p3.y - pointToTest.y;
-
-        double p1p2Det = p1dx * p2dy - p2dx * p1dy;
-        double p2p3Det = p2dx * p3dy - p3dx * p2dy;
-        double p3p1Det = p3dx * p1dy - p1dx * p3dy;
-        
-        double p1Lift = Math.pow(p1dx, 2) + Math.pow(p1dy, 2);
-        double p2Lift = Math.pow(p2dx, 2) + Math.pow(p2dy, 2);
-        double p3Lift = Math.pow(p3dx, 2) + Math.pow(p3dy, 2);
-
-        return p1Lift * p2p3Det + p2Lift * p3p1Det + p3Lift * p1p2Det > 0;
     }
 }
