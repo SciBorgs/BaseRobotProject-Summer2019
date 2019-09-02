@@ -13,4 +13,6 @@ public interface WallMap{
     boolean intersects(LineSegment ls);
     boolean intersects(Ray r);
     boolean intersects(Line l);
+    
+    boolean inWall(LineSegment e);
 }

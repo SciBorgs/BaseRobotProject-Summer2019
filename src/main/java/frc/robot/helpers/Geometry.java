@@ -2,7 +2,7 @@ package frc.robot.helpers;
 
 import java.util.Optional;
 
-import frc.robot.routing.navigationmesh.Edge;
+import frc.robot.routing.Edge;
 
 public class Geometry {
     public static final Point ORIGIN = new Point(0, 0);
