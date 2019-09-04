@@ -1,16 +1,14 @@
 package frc.robot.routing;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import frc.robot.helpers.Point;
 import frc.robot.helpers.WallMap;
 
 public class Router {
-    private Point currentPoint;
-    private Point goalPoint;
+    private Point currentPoint, goalPoint;
     private WallMap wallMap;
-    
+
     public Router(Point currentPoint, Point goalPoint, WallMap wallMap) {
         this.currentPoint = currentPoint;
         this.goalPoint    = goalPoint;
@@ -18,6 +16,7 @@ public class Router {
     }
 
     public List<Point> computeRoute() {
-        return new ArrayList<Point>();
+        Mesh triangleSoup = new Mesh(currentPoint, goalPoint, wallMap);
+        return new AStar(triangleSoup.generateMesh(), currentPoint, goalPoint).findOptimalPath();
     }
 }

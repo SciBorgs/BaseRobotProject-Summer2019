@@ -32,8 +32,12 @@ public class Geometry {
 
     public static Line getPerpendicular(Line line, Point point){return createLine(point, -1 / line.m);}
 
-    public static double getDistance(Point point1, Point point2) {
-        return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+    public static double getDistance(Point p1, Point p2) {
+        return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    }
+
+    public static double getManhattanDistance(Point p1, Point p2) {
+        return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
     }
 
     public static double getDistance(Line line, Point point) {

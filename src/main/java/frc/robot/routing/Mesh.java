@@ -12,17 +12,20 @@ import frc.robot.helpers.Ray;
 import frc.robot.helpers.WallMap;
 
 public class Mesh {
-    private Point currentPoint;
+    private Point currentPoint, goalPoint;
     private WallMap wallMap;
     private final int ANGLE_INCREMENT = 5;
 
-    public Mesh(Point currentPoint, WallMap wallMap) {
+    public Mesh(Point currentPoint, Point goalPoint, WallMap wallMap) {
         this.currentPoint = currentPoint;
-        this.wallMap = wallMap;
+        this.goalPoint    = goalPoint;
+        this.wallMap      = wallMap;
     }
 
-    private HashSet<Edge> generateMesh() {
+    public HashSet<Edge> generateMesh() {
         HashSet<Point> intersections = new HashSet<>();
+        intersections.add(currentPoint);
+        intersections.add(goalPoint);
         Point rayDirection = new Point(this.currentPoint.x, this.currentPoint.y + 1);
         
         for (int i = 0; i < 360; i += ANGLE_INCREMENT) {

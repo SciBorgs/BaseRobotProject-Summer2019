@@ -80,8 +80,8 @@ public class Triangulation {
             }
             Edge base = createConnectingEdge(rdi.symEdge, ldi);
 
-            if (ldi.origin == ldo.origin){ldo = base.symEdge;}
-            if (rdi.origin == rdo.origin){rdo = base;}
+            if (ldi.origin.equals(ldo.origin)){ldo = base.symEdge;}
+            if (rdi.origin.equals(rdo.origin)){rdo = base;}
             while (true) {
                 Edge leftCand = base.symEdge.nextOrigin;
                 boolean isLeftCandValid = Geometry.isRightOf(leftCand.dest, base);
