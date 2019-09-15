@@ -16,7 +16,7 @@ public class Router {
     }
 
     public List<Point> computeRoute() {
-        Mesh triangleSoup = new Mesh(currentPoint, goalPoint, wallMap);
-        return new AStar(triangleSoup.generateMesh(), currentPoint, goalPoint).findOptimalPath();
+        Mesh triangleSoup = new Mesh(this.currentPoint, this.goalPoint, this.wallMap);
+        return new AStar(triangleSoup.generateMesh(), this.currentPoint, this.goalPoint).findOptimalPath();
     }
 }

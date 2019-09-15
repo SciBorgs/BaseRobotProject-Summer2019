@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 
-import frc.robot.helpers.Geometry;
+import frc.robot.helpers.Geo;
 import frc.robot.helpers.Pair;
 import frc.robot.helpers.Point;
 
@@ -43,10 +43,10 @@ public class Triangulation {
             Edge e1 = createEdge(points.get(0), points.get(1));
             Edge e2 = createEdge(points.get(1), points.get(2));
 
-            if (Geometry.isLeftOf(points.get(2), e1)) {
+            if (Geo.isLeftOf(points.get(2), e1)) {
                 createConnectingEdge(e2, e1);
                 return new Pair<Edge,Edge>(e1, e2.symEdge);
-            } else if (Geometry.isRightOf(points.get(2), e1)) {
+            } else if (Geo.isRightOf(points.get(2), e1)) {
                 Edge connectingEdge = createConnectingEdge(e2, e1);
                 return new Pair<Edge, Edge>(connectingEdge.symEdge, connectingEdge);
             } else{return new Pair<Edge,Edge>(e1, e2.symEdge);}
@@ -74,8 +74,8 @@ public class Triangulation {
             Edge ldi = leftHandles.second; Edge rdo = rightHandles.second;
 
             while (true) {
-                if (Geometry.isLeftOf(rdi.origin, ldi)){ldi = ldi.symEdge.nextOrigin;}
-                else if (Geometry.isRightOf(ldi.origin, rdi)){rdi = rdi.symEdge.prevOrigin;}
+                if (Geo.isLeftOf(rdi.origin, ldi)){ldi = ldi.symEdge.nextOrigin;}
+                else if (Geo.isRightOf(ldi.origin, rdi)){rdi = rdi.symEdge.prevOrigin;}
                 else{break;}
             }
             Edge base = createConnectingEdge(rdi.symEdge, ldi);
@@ -84,10 +84,10 @@ public class Triangulation {
             if (rdi.origin.equals(rdo.origin)){rdo = base;}
             while (true) {
                 Edge leftCand = base.symEdge.nextOrigin;
-                boolean isLeftCandValid = Geometry.isRightOf(leftCand.dest, base);
+                boolean isLeftCandValid = Geo.isRightOf(leftCand.dest, base);
 
                 if (isLeftCandValid) {
-                    while (Geometry.isPointInCircle(base.dest, base.origin, 
+                    while (Geo.isPointInCircle(base.dest, base.origin, 
                                                     leftCand.dest, leftCand.nextOrigin.dest)) {
                         Edge temp = leftCand.nextOrigin;
                         deleteEdge(leftCand);
@@ -95,10 +95,10 @@ public class Triangulation {
                     }
                 }
                 Edge rightCand = base.prevOrigin;
-                boolean isRightCandValid = Geometry.isRightOf(rightCand.dest, base);
+                boolean isRightCandValid = Geo.isRightOf(rightCand.dest, base);
 
                 if (isRightCandValid) {
-                    while (Geometry.isPointInCircle(base.dest, base.origin, 
+                    while (Geo.isPointInCircle(base.dest, base.origin, 
                                                     rightCand.dest, rightCand.prevOrigin.dest)) {
                         Edge temp = rightCand.prevOrigin;
                         deleteEdge(rightCand);
@@ -106,7 +106,7 @@ public class Triangulation {
                     }
                 }
                 if (!isLeftCandValid && !isRightCandValid){break;}
-                if (!isLeftCandValid || (isRightCandValid && Geometry.isPointInCircle(leftCand.dest, leftCand.origin, 
+                if (!isLeftCandValid || (isRightCandValid && Geo.isPointInCircle(leftCand.dest, leftCand.origin, 
                                                                                       rightCand.origin, rightCand.dest))) {
                     base = createConnectingEdge(rightCand, base.symEdge);
                 } else{base = createConnectingEdge(base.symEdge, leftCand.symEdge);}

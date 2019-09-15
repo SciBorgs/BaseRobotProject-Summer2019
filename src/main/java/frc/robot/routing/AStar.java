@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import frc.robot.helpers.Geometry;
+import frc.robot.helpers.Geo;
 import frc.robot.helpers.Point;
 
 public class AStar {
@@ -23,29 +23,29 @@ public class AStar {
     }
 
     public List<Point> findOptimalPath() {
-        HashSet<Edge> initialEdges = getEdgesFromPoint(currentPoint);
+        HashSet<Edge> initialEdges = getEdgesFromPoint(this.currentPoint);
 
         for (Edge edge: initialEdges) {
-            if (edge.dest.equals(goalPoint)){return Arrays.asList(goalPoint);}
+            if (edge.dest.equals(this.goalPoint)){return Arrays.asList(this.goalPoint);}
         }
         HashMap<Point, Point> path = new HashMap<>();
         HashSet<Point> closed = new HashSet<>();
         PriorityQueue<Point> queue = new PriorityQueue<>(Comparator.comparing(p -> p.fScore));
-        queue.add(currentPoint);
+        queue.add(this.currentPoint);
 
         while (!queue.isEmpty()) {
             Point head = queue.poll();
             closed.add(head);
             
-            if (head.equals(goalPoint)){break;}
+            if (head.equals(this.goalPoint)){break;}
             HashSet<Edge> connectedEdges;
             
-            if (head.equals(currentPoint)){connectedEdges = initialEdges;}
+            if (head.equals(this.currentPoint)){connectedEdges = initialEdges;}
             else{connectedEdges = getEdgesFromPoint(head);}
             for (Edge edge: connectedEdges) {
                 Point neighbor = edge.dest;
-                neighbor.gScore = head.gScore + Geometry.getDistance(head, neighbor);
-                neighbor.fScore = neighbor.gScore + Geometry.getManhattanDistance(goalPoint, neighbor);
+                neighbor.gScore = head.gScore + Geo.getDistance(head, neighbor);
+                neighbor.fScore = neighbor.gScore + Geo.getManhattanDistance(this.goalPoint, neighbor);
                 if (contains(queue, neighbor) || contains(closed, neighbor)){continue;}
                 queue.remove(neighbor);
                 closed.remove(neighbor);
@@ -55,13 +55,13 @@ public class AStar {
         }
 
         List<Point> finalPath = new ArrayList<>();
-        Point point = goalPoint;
+        Point point = this.goalPoint;
     
-        while (!point.equals(currentPoint)) {
+        while (!point.equals(this.currentPoint)) {
             finalPath.add(point);
             point = path.get(point);
         }
-        finalPath.add(currentPoint);
+        finalPath.add(this.currentPoint);
         Collections.reverse(finalPath);
         return finalPath;
     }
@@ -75,7 +75,7 @@ public class AStar {
 
     private HashSet<Edge> getEdgesFromPoint(Point point) {
         HashSet<Edge> edges = new HashSet<>();
-        for (Edge edge: triangulatedEdges) {
+        for (Edge edge: this.triangulatedEdges) {
             if (edge.origin.equals(point)){edges.add(edge);}
         }
         return edges;

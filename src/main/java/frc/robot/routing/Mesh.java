@@ -1,11 +1,10 @@
 package frc.robot.routing;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import frc.robot.helpers.Geometry;
+import frc.robot.helpers.Geo;
 import frc.robot.helpers.LineSegment;
 import frc.robot.helpers.Point;
 import frc.robot.helpers.Ray;
@@ -24,13 +23,13 @@ public class Mesh {
 
     public HashSet<Edge> generateMesh() {
         HashSet<Point> intersections = new HashSet<>();
-        intersections.add(currentPoint);
-        intersections.add(goalPoint);
+        intersections.add(this.currentPoint);
+        intersections.add(this.goalPoint);
         Point rayDirection = new Point(this.currentPoint.x, this.currentPoint.y + 1);
         
         for (int i = 0; i < 360; i += ANGLE_INCREMENT) {
             List<Point> intersectionsAtAngle = this.wallMap.allIntersections(new Ray(this.currentPoint, rayDirection));
-            rayDirection = Geometry.rotatePoint(rayDirection, this.currentPoint, Math.toRadians(i));
+            rayDirection = Geo.rotatePoint(rayDirection, Math.toRadians(i), this.currentPoint);
             for (Point point: intersectionsAtAngle) {
                 intersections.add(point);
             }
@@ -40,11 +39,10 @@ public class Mesh {
         return triangulatedEdges;
     }
 
-    // NOTE: This is temporary; Line, LineSegment, Ray, and Edge will eventually share the same superclass
     private void pruneBadTriangles(HashSet<Edge> triangulatedEdges) {
         for (Edge edge: triangulatedEdges) {
             // A triangle is defined by edge, edge.nextOrigin, and edge.symEdge.prevOrigin
-            List<Point> intersections = wallMap.allIntersections(new LineSegment(edge.origin, edge.dest));
+            List<Point> intersections = this.wallMap.allIntersections(new LineSegment(edge.origin, edge.dest));
             if (intersections.size() == 3) {
                 List<Point> triangleVertices = Arrays.asList(edge.origin, edge.dest, edge.nextOrigin.dest);
                 if (intersections.containsAll(triangleVertices)) {
@@ -52,9 +50,9 @@ public class Mesh {
                     triangulatedEdges.remove(edge.nextOrigin);
                     triangulatedEdges.remove(edge.symEdge.prevOrigin);
                 }
-            } else if (wallMap.inWall(new LineSegment(edge.origin, edge.dest)) &&
-                       wallMap.inWall(new LineSegment(edge.nextOrigin.origin, edge.nextOrigin.dest)) &&
-                       wallMap.inWall(new LineSegment(edge.symEdge.prevOrigin.origin, edge.symEdge.prevOrigin.dest))) {
+            } else if (this.wallMap.inWall(edge) &&
+                       this.wallMap.inWall(edge.nextOrigin) &&
+                       this.wallMap.inWall(edge.symEdge.prevOrigin)) {
                 triangulatedEdges.remove(edge);
                 triangulatedEdges.remove(edge.nextOrigin);
                 triangulatedEdges.remove(edge.symEdge.prevOrigin);

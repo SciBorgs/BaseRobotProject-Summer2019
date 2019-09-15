@@ -4,15 +4,11 @@ import java.util.ArrayList;
 
 public interface WallMap{
 
-    // Returns an arraylist with all points on the map that intersect the given LineSegment/Ray/Line
-    ArrayList<Point> allIntersections(LineSegment ls); 
-    ArrayList<Point> allIntersections(Ray r); 
-    ArrayList<Point> allIntersections(Line l); 
+    // Returns an arraylist with all points on the map that intersect the given line-like
+    ArrayList<Point> allIntersections(LineLike ls);
     
-    // Determines whether or not a line segment intersects a place on the map
-    boolean intersects(LineSegment ls);
-    boolean intersects(Ray r);
-    boolean intersects(Line l);
+    // Determines whether or not a line-like intersects a place on the map
+    boolean intersects(LineLike ls);
     
-    boolean inWall(LineSegment e);
+    boolean inWall(LineLike e);
 }
