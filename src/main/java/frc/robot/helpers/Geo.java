@@ -39,6 +39,14 @@ public class Geo {
         return bringInRange(theta, -MAX_ANGLE / 4, MAX_ANGLE / 4);
     }
 
+    public static double getSlope(Point A, Point B) {
+         return (B.y - A.y)/(B.x - A.x);
+    }
+
+    public static double getYIntercept(Point A, Point B) { 
+        return A.y - A.x * getSlope(A, B); 
+    }
+
     public static double mOf(LineLike lLike) { // Slope
         return Math.tan(thetaOf(lLike));
     }
