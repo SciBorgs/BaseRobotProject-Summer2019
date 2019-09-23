@@ -82,6 +82,11 @@ public class Geo {
         return ((point2.x - point1.x) * (point2.x - point1.x)) + ((point2.y - point1.y) * (point2.y - point1.y));
     }
 
+    public static boolean intersects(Point p1, Point p2, LineSegment segment) {
+        double o1 = getOrientation(p1, p2, segment.p1);
+
+    }
+
     public static double getDistance(LineLike lLike, Point point) {
         Line fakeLine = lLike.toLine();  
         Optional<Point> intersection = getIntersection(getPerpendicular(fakeLine, point), lLike); // If not a line, it might not intersect
@@ -111,7 +116,7 @@ public class Geo {
     }
 
     public static boolean arePointsCollinear(Point p1, Point p2, Point p3, double precision) {
-        return collinear(p1, p2, p3) <= precision;
+        return Math.abs(collinear(p1, p2, p3)) <= precision;
     }
 
     private static double collinear(Point p1, Point p2, Point p3) {

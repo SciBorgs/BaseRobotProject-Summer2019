@@ -7,12 +7,14 @@ public class Point implements Serializable {
     private static final long serialVersionUID = 2;
 
     public double x, y, fScore, gScore;
+    public int polygonID;
 
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
         this.fScore = 0.0;
         this.gScore = 0.0;
+        this.polygonID = -1;
     }
 
     @Override
