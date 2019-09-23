@@ -26,8 +26,10 @@ public class RANSAC {
             Point A = points.get(pointAIndex);
             Point B = points.get(pointBIndex);
 
-            double slope = Geo.getSlope(A, B);
-            double yIntercept = Geo.getYIntercept(A, B);
+            Line line = new Line(A,B);
+
+            double slope = Geo.mOf(line);
+            double yIntercept = Geo.bOf(line);
 
             for (int i = 0; i <= points.size(); i++) {
                 Point linePoint = new Point(points.get(i).x, points.get(i).y * slope + yIntercept);
