@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class KMeans {
-    private static Random generator = new Random();    
+    private static Random generator = new Random();
 
-    public static ArrayList<ArrayList<Point>> returnClusters(ArrayList<Point> points, int ) {
+    public static ArrayList<ArrayList<Point>> returnClusters(ArrayList<Point> points, int k) {
         ArrayList<ArrayList<Point>> clusters = new ArrayList<ArrayList<Point>>();
         int numOfPoints = points.size();
-        ArrayList<Point> kValues = getKValues(points, numofPoints, k);
+        ArrayList<Point> kValues = getKValues(points, numOfPoints, k);
+        for (int i = 0; i < numOfPoints; i++) {
+
+        }
         return clusters;
     }
 
@@ -20,5 +23,6 @@ public class KMeans {
             Point kValue = points.get(kIndex);
             kValues.add(kValue);
         }
+        return kValues;
     }
 }
