@@ -10,8 +10,8 @@ public class KMeans {
         ArrayList<ArrayList<Point>> clusters = new ArrayList<ArrayList<Point>>();
         int numOfPoints = points.size();
         ArrayList<Point> kValues = getKValues(points, numOfPoints, k);
-        for (int i = 0; i < numOfPoints; i++) {
-
+        for (int i = 0; i < kValues.size(); i++) {
+            
         }
         return clusters;
     }
