@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import frc.robot.helpers.Line;
+import frc.robot.helpers.Geo;
+import frc.robot.helpers.LineSegment;
 import frc.robot.helpers.Point;
-import frc.robot.helpers.Ray;
 
 public class VisibilityGraph {
     private PolygonGraph polygonGraph;
@@ -18,21 +18,27 @@ public class VisibilityGraph {
     }
 
     public List<Point> generateVisiblityGraph() {
-        Set<Point> vertices = this.polygonGraph.getPoints();
+        Set<Point> points = this.polygonGraph.getPoints();
         List<Point> visible = new ArrayList<>();
-        for (Point point: vertices) {
-            
+        for (Point point: points) {
         }
 
         return visible;
     }
 
     private List<Point> getVisibleVertices(Point point) {
+        Comparator<Point> comparator = Comparator.comparing(p -> Geo.angleBetween(point, p));
+        comparator.thenComparing(p -> Geo.getDistanceSquared(point, p));
         List<Point> sortedPoints = this.polygonGraph.getPoints()
                                                     .stream()
-                                                    .sorted(Comparator.comparing(p -> getAngle(point, p)))
+                                                    .sorted(comparator)
                                                     .collect(Collectors.toList());
-        Ray scanRay = new Ray(point, new Point(point.x + 1, point.y));
-        
+        Point scanPoint = new Point(Double.POSITIVE_INFINITY, point.y);
+        OpenEdgeTree tree = new OpenEdgeTree();
+        for (LineSegment edge: this.polygonGraph.getEdges()) {
+            LineSegment scanLine = new LineSegment(point, scanPoint);
+            if (!scanLine.contains(edge.p1) && 
+                !scanLine.contains(edge.p2)) tree.insert(scanLine, edge);
+        }
     }
 }

@@ -82,11 +82,6 @@ public class Geo {
         return ((point2.x - point1.x) * (point2.x - point1.x)) + ((point2.y - point1.y) * (point2.y - point1.y));
     }
 
-    public static boolean intersects(Point p1, Point p2, LineSegment segment) {
-        double o1 = getOrientation(p1, p2, segment.p1);
-
-    }
-
     public static double getDistance(LineLike lLike, Point point) {
         Line fakeLine = lLike.toLine();  
         Optional<Point> intersection = getIntersection(getPerpendicular(fakeLine, point), lLike); // If not a line, it might not intersect
@@ -172,6 +167,10 @@ public class Geo {
 
     public static boolean areParallel(LineLike l1, LineLike l2, double precision) {
         return thetaOf(l1) - thetaOf(l2) <= precision;
+    }
+
+    public static boolean doIntersect(LineLike lLike1, LineLike lLike2) {
+        return getIntersection(lLike1, lLike2).isPresent();
     }
 
     public static Optional<Point> getIntersection(LineLike lLike1, LineLike lLike2) {

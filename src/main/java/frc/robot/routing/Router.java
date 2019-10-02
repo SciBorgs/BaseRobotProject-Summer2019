@@ -25,11 +25,11 @@ public class Router {
         Optional<VisibilityGraph> optionalVisibilityGraph = getVisibilityGraph();
         if (optionalVisibilityGraph.isPresent()){visibilityGraph = optionalVisibilityGraph.get();}
         else{visibilityGraph = new VisibilityGraph(getPolygonGraph());}
-
+        
     }
 
     private Optional<VisibilityGraph> getVisibilityGraph() {
-        URL url = this.getClass().getResource("/frc/robot/routing/maps" + map.toString() + ".map");
+        URL url = this.getClass().getResource("/frc/robot/routing/maps" + this.map.toString() + ".map");
         try {
             InputStream inputStream = url.openStream();
             try {
