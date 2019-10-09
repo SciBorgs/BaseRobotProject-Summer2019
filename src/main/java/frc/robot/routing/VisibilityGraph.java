@@ -1,44 +1,53 @@
 package frc.robot.routing;
 
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import frc.robot.helpers.Geo;
-import frc.robot.helpers.LineSegment;
-import frc.robot.helpers.Point;
+import frc.robot.shapes.LineSegment;
+import frc.robot.shapes.Point;
+import frc.robot.tests.Tester;
 
 public class VisibilityGraph {
-    private PolygonGraph polygonGraph;
+    private List<Point> vertices;
 
-    public VisibilityGraph(PolygonGraph polygonGraph) {
-        this.polygonGraph = polygonGraph;
+    // Vertices must be structured in the following manner...
+    // startPoint -> obstacles -> goalPoint
+    public VisibilityGraph(List<Point> vertices) {
+        this.vertices = vertices;
     }
 
-    public List<Point> generateVisiblityGraph() {
-        Set<Point> points = this.polygonGraph.getPoints();
-        List<Point> visible = new ArrayList<>();
-        for (Point point: points) {
+    public HashMap<Point, Point> generateVisibilityGraph() {
+        List<LineSegment> edges = getEdges();
+        for (Point vertex: this.vertices) {
+            List<Point> subList = this.vertices.stream()
+                                               .filter(v -> !v.equals(vertex))
+                                               .collect(Collectors.toList());
+            subList.sort(Comparator.comparing(v -> Geo.angleBetween(vertex, (Point) v) % (2 * Math.PI))); // NOTE: angleBetween's output is
+                                                                                                          // mapped from [-pi, pi] to [0, 180]
         }
-
-        return visible;
     }
 
-    private List<Point> getVisibleVertices(Point point) {
-        Comparator<Point> comparator = Comparator.comparing(p -> Geo.angleBetween(point, p));
-        comparator.thenComparing(p -> Geo.getDistanceSquared(point, p));
-        List<Point> sortedPoints = this.polygonGraph.getPoints()
-                                                    .stream()
-                                                    .sorted(comparator)
-                                                    .collect(Collectors.toList());
-        Point scanPoint = new Point(Double.POSITIVE_INFINITY, point.y);
-        OpenEdgeTree tree = new OpenEdgeTree();
-        for (LineSegment edge: this.polygonGraph.getEdges()) {
-            LineSegment scanLine = new LineSegment(point, scanPoint);
-            if (!scanLine.contains(edge.p1) && 
-                !scanLine.contains(edge.p2)) tree.insert(scanLine, edge);
+    private List<LineSegment> getEdges() {
+        List<LineSegment> edges = new ArrayList<>();
+        for (int i = 1; i < this.vertices.size() - 1; ++i) {
+            Point currentVertex = this.vertices.get(i);
+            Point polygonStart = null;
+
+            if (this.vertices.get(i - 1).polygonID != currentVertex.polygonID) { // currentVertex is the starting point of the polygon
+                polygonStart = currentVertex;
+            }
+
+            if (this.vertices.get(i + 1).polygonID == currentVertex.polygonID) {
+                edges.add(new LineSegment(currentVertex, this.vertices.get(i + 1)));
+            } else {
+                Tester.assertNotEquals(polygonStart, null, "Invalid vertices structure");
+                edges.add(new LineSegment(currentVertex, polygonStart)); // reached end point of polygon, connect back to starting point
+            }
         }
+        return edges;
     }
 }
