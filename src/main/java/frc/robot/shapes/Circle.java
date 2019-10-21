@@ -25,7 +25,7 @@ public class Circle {
         return new Circle(center, radius);
     }
 
-    private static double calculateK (Point currPosRotated, Point finalPosRotated) {
+    public static double calculateK(Point currPosRotated, Point finalPosRotated) {
         double x0, y0, x1, y1;
         x0 = currPosRotated.x;
         y0 = currPosRotated.y;

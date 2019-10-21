@@ -16,7 +16,6 @@ public class Point implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (o.getClass() != Point.class) {return false;}
         Point point = (Point) o;
 
         return Utils.impreciseEquals(this.x, point.x)

@@ -18,7 +18,6 @@ public class Line extends LineLike{
 
     @Override
     public boolean equals(Object o) {
-        if (o.getClass() != Line.class) {return false;}
         Line line = (Line) o;
 
         return Geo.thetaOf(this) - Geo.thetaOf(line) <= Utils.getEpsilon() && this.contains(line.p2);
