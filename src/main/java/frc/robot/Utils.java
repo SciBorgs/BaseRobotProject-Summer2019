@@ -106,7 +106,7 @@ public class Utils{
 
     // Deep copy (no referencing) of an arraylist
     public static<T> void deepCopy(ArrayList<T> arrToCopy, ArrayList<T> newArr) {
-        for(int i = 0; i < arrToCopy.size() - 1; i++) {
+        for(int i = 0; i < arrToCopy.size(); i++) {
             newArr.add(arrToCopy.get(i));
         }
     }
