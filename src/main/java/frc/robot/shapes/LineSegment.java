@@ -20,6 +20,7 @@ public class LineSegment extends LineLike implements AlmostLine {
 
     @Override
     public boolean equals(Object o) {
+        if (o.getClass() != LineSegment.class) {return false;}
         LineSegment lineSegment = (LineSegment) o;
 
         return this.p1.equals(lineSegment.p1) && this.p2.equals(lineSegment.p2)

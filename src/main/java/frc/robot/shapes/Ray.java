@@ -20,6 +20,7 @@ public class Ray extends LineLike implements AlmostLine{
     }
 
     public boolean equals(Ray ray) {
+        if (o.getClass() != Ray.class) {return false;}
         return this.p1.equals(ray.p1) && this.contains(ray.p2);
     }
 }
