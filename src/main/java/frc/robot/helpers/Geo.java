@@ -55,7 +55,7 @@ public class Geo {
         return Math.tan(thetaOf(lLike));
     }
 
-    public static double bOf(LineLike lLike) { // Y-intercept
+    public static double bOf(LineLike lLike) {
         return lLike.p1.y - mOf(lLike) * lLike.p1.x;
     }
 
@@ -127,7 +127,7 @@ public class Geo {
         return Math.abs(collinear(p1, p2, p3)) <= precision;
     }
 
-    private static double collinear(Point p1, Point p2, Point p3) { // Also thinking on this
+    private static double collinear(Point p1, Point p2, Point p3) {
         return Math.abs((p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y));
     }
 
@@ -147,8 +147,7 @@ public class Geo {
         double p2Lift = Math.pow(p2dx, 2) + Math.pow(p2dy, 2);
         double p3Lift = Math.pow(p3dx, 2) + Math.pow(p3dy, 2);
 
-        return p1Lift * p2p3Det + p2Lift * p3p1Det + p3Lift * p1p2Det > 0; // If is greater, point lies outside of
-                                                                           // circle.
+        return p1Lift * p2p3Det + p2Lift * p3p1Det + p3Lift * p1p2Det > 0;
     }
 
     public static Line getTangentToCircle(Circle circle, Point tangentPoint) {
