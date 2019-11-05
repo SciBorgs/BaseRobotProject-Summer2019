@@ -116,7 +116,7 @@ public class Geo {
     }
 
     public static boolean arePointsCollinear(Point p1, Point p2, Point p3) {
-        return arePointsCollinear(p1, p2, p3, Utils.getEpsilon());
+        return arePointsCollinear(p1, p2, p3, Utils.EPSILON);
     }
 
     public static boolean arePointsExactlyCollinear(Point p1, Point p2, Point p3) {
@@ -129,6 +129,10 @@ public class Geo {
 
     private static double collinear(Point p1, Point p2, Point p3) {
         return Math.abs((p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y));
+    }
+
+    public static double getOrientation(Point p1, LineLike lLike) {
+        return (lLike.p2.x - lLike.p1.x) * (p1.y - lLike.p1.y) - (p1.x - lLike.p1.x) * (lLike.p2.y - lLike.p1.y);
     }
 
     public static boolean isPointInCircle(Point p1, Point p2, Point p3, Point pointToTest) {
