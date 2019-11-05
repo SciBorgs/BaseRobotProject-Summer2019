@@ -10,5 +10,3 @@ public class Pair<First, Second> {
         this.second = second;
     }
 }
-
-// :D

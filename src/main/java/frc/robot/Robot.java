@@ -8,14 +8,20 @@ import frc.robot.stateEstimation.*;
 import frc.robot.logging.*;
 import frc.robot.shapes.*;
 import frc.robot.logging.Logger.DefaultValue;
+import frc.robot.routing.PlayingField;
 import frc.robot.RobotState.SD;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 public class Robot extends TimedRobot {
+    public static PlayingField defaultField = new PlayingField(new LineSegment(new Point(3,4), new Point(5,4)), 
+                                                               new LineSegment(new Point(5,4), new Point(5,8)),
+                                                               new LineSegment(new Point(5,8), new Point(3,8)),
+                                                               new LineSegment(new Point(3,8), new Point(3,4)));
+
     public static Logger logger = new Logger();
-    
+
     public static DriveSubsystem      driveSubsystem      = new DriveSubsystem();
     public static GearShiftSubsystem  gearShiftSubsystem  = new GearShiftSubsystem();
     public static EncoderSubsystem    encoderSubsystem    = new EncoderSubsystem();

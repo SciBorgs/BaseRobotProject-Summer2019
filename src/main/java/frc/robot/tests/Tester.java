@@ -18,7 +18,7 @@ public class Tester{
         testBool(testName, "Statement true", !b);
     }
     
-    private static <N1 extends Number, N2 extends Number> void equalAssertion(N1 n1, N2 n2, String testName, boolean requireEqual) {
+    private static void equalAssertion(Number n1, Number n2, String testName, boolean requireEqual) {
         // It is possible you could get some rounding errors here, maybe not
         // Someone should look into that
         double d1 = n1.doubleValue();
@@ -34,10 +34,10 @@ public class Tester{
         testBool(testName, "Assertion that " + o1 + " doesn't equal " + o2, !o1.equals(o2));
     }
 
-    public static <N1 extends Number, N2 extends Number> void assertEquals(N1 n1, N2 n2, String testName) {
+    public static void assertEquals(Number n1, Number n2, String testName) {
         equalAssertion(n1, n2, testName, true);
     }
-    public static <N1 extends Number, N2 extends Number> void assertNotEquals(N1 n1, N2 n2, String testName) {
+    public static void assertNotEquals(Number n1, Number n2, String testName) {
         equalAssertion(n1, n2, testName, false);
     }
 

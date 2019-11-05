@@ -1,6 +1,7 @@
 package frc.robot.shapes;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import frc.robot.Utils;
 
@@ -16,7 +17,7 @@ public class Point implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (o.getClass() != Point.class) {return false;}
+        if (o.getClass() != Point.class){return false;}
         Point point = (Point) o;
 
         return Utils.impreciseEquals(this.x, point.x)
@@ -24,7 +25,12 @@ public class Point implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+      return Objects.hash(this.x, this.y);
+    }
+
+    @Override
     public String toString() {
-        return getClass().getName() + "(" + x + "," + y + ")";
+        return getClass().getName() + "(" + this.x + "," + this.y + ")";
     }
 }

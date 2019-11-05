@@ -55,7 +55,7 @@ public class Geo {
         return Math.tan(thetaOf(lLike));
     }
 
-    public static double bOf(LineLike lLike) { // Y-intercept
+    public static double bOf(LineLike lLike) {
         return lLike.p1.y - mOf(lLike) * lLike.p1.x;
     }
 
@@ -111,8 +111,12 @@ public class Geo {
         return getDistance(point, intersection.get());
     }
 
+    public static double getManhattanDistance(Point point1, Point point2) {
+        return Math.abs(point1.x - point2.x) + Math.abs(point1.y - point2.y);
+    }
+
     public static boolean arePointsCollinear(Point p1, Point p2, Point p3) {
-        return arePointsCollinear(p1, p2, p3, Utils.getEpsilon());
+        return arePointsCollinear(p1, p2, p3, Utils.EPSILON);
     }
 
     public static boolean arePointsExactlyCollinear(Point p1, Point p2, Point p3) {
@@ -120,11 +124,15 @@ public class Geo {
     }
 
     public static boolean arePointsCollinear(Point p1, Point p2, Point p3, double precision) {
-        return collinear(p1, p2, p3) <= precision;
+        return Math.abs(collinear(p1, p2, p3)) <= precision;
     }
 
-    private static double collinear(Point p1, Point p2, Point p3) { // Also thinking on this
+    private static double collinear(Point p1, Point p2, Point p3) {
         return Math.abs((p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y));
+    }
+
+    public static double getOrientation(Point p1, LineLike lLike) {
+        return (lLike.p2.x - lLike.p1.x) * (p1.y - lLike.p1.y) - (p1.x - lLike.p1.x) * (lLike.p2.y - lLike.p1.y);
     }
 
     public static boolean isPointInCircle(Point p1, Point p2, Point p3, Point pointToTest) {
@@ -143,8 +151,7 @@ public class Geo {
         double p2Lift = Math.pow(p2dx, 2) + Math.pow(p2dy, 2);
         double p3Lift = Math.pow(p3dx, 2) + Math.pow(p3dy, 2);
 
-        return p1Lift * p2p3Det + p2Lift * p3p1Det + p3Lift * p1p2Det > 0; // If is greater, point lies outside of
-                                                                           // circle.
+        return p1Lift * p2p3Det + p2Lift * p3p1Det + p3Lift * p1p2Det > 0;
     }
 
     public static Line getTangentToCircle(Circle circle, Point tangentPoint) {
@@ -160,20 +167,24 @@ public class Geo {
         return pointAngleForm(point, thetaOf(line) + ANGLE_RANGE / 4);
     }
 
-    public static boolean areParellel(LineLike l1, LineLike l2) {
+    public static boolean areParallel(LineLike l1, LineLike l2) {
         return Utils.impreciseEquals(thetaOf(l1), thetaOf(l2));
     }
 
-    public static boolean areExactlyParellel(LineLike l1, LineLike l2) {
-        return areParellel(l1, l2, 0);
+    public static boolean areExactlyParallel(LineLike l1, LineLike l2) {
+        return areParallel(l1, l2, 0);
     }
 
-    public static boolean areParellel(LineLike l1, LineLike l2, double precision) {
+    public static boolean areParallel(LineLike l1, LineLike l2, double precision) {
         return Utils.impreciseEquals(thetaOf(l1), thetaOf(l2), precision);
     }
 
+    public static boolean doIntersect(LineLike lLike1, LineLike lLike2) {
+        return getIntersection(lLike1, lLike2).isPresent();
+    }
+
     public static Optional<Point> getIntersection(LineLike lLike1, LineLike lLike2) {
-        if (areExactlyParellel(lLike1, lLike2)) {
+        if (areExactlyParallel(lLike1, lLike2)) {
             return Optional.empty();
         }
 

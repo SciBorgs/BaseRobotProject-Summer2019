@@ -92,7 +92,7 @@ public class Logger{
         switch (commandStatus) {
             case Initializing: stringStatus = "initializing"; break;
             case Executing:    stringStatus = "executing";    break;
-            case Ending:       stringStatus = "edning";       break;
+            case Ending:       stringStatus = "ending";       break;
             case Interrupted:  stringStatus = "interrupted";  break;
         }
         addData(filename, commandStatusName, stringStatus, DefaultValue.Empty);
@@ -179,7 +179,7 @@ public class Logger{
                 fullData.put(column, data);
             }
         }
-        return Utils.hatshtableDataToString(fullData);
+        return Utils.hashtableDataToString(fullData);
     }
 
     public void logData(){

@@ -21,11 +21,6 @@ public class Line extends LineLike{
         if (o.getClass() != Line.class) {return false;}
         Line line = (Line) o;
 
-        return Geo.thetaOf(this) - Geo.thetaOf(line) <= Utils.getEpsilon() && this.contains(line.p2);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getName() + " @ " + "P1:(" + p1.x + "," + p1.y + ") " + "P2:(" + p2.x + "," + p2.y + ")";
+        return Geo.thetaOf(this) - Geo.thetaOf(line) <= Utils.EPSILON && this.contains(line.p2);
     }
 }

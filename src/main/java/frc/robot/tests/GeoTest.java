@@ -168,17 +168,17 @@ public class GeoTest {
         LineSegment parallelSegment1 = new LineSegment(new Point(2,2), new Point(2,0));
         LineSegment parallelSegment2 = new LineSegment(new Point(1,0), new Point(1,2));
         
-        Tester.assertTrue(Geo.areParellel(new Line(o, new Point(0,1)), 
+        Tester.assertTrue(Geo.areParallel(new Line(o, new Point(0,1)), 
                                           new Line(new Point(1,0), new Point(1,1))), "areParallel, Test #1"); // Vertical
         
-        Tester.assertTrue(Geo.areParellel(           parallelLine1,             parallelLine2),  "areParallel, Test #2");
-        Tester.assertTrue(Geo.areParellel(flipPoints(parallelLine1), flipPoints(parallelLine2)), "areParallel, Test #3");
+        Tester.assertTrue(Geo.areParallel(           parallelLine1,             parallelLine2),  "areParallel, Test #2");
+        Tester.assertTrue(Geo.areParallel(flipPoints(parallelLine1), flipPoints(parallelLine2)), "areParallel, Test #3");
 
-        Tester.assertTrue(Geo.areParellel(parallelRay1, parallelRay2), "areParallelRay, Test #4");
+        Tester.assertTrue(Geo.areParallel(parallelRay1, parallelRay2), "areParallelRay, Test #4");
 
-        Tester.assertTrue(Geo.areParellel(parallelSegment1, parallelSegment2), "areParallelSegment, Test #5");
+        Tester.assertTrue(Geo.areParallel(parallelSegment1, parallelSegment2), "areParallelSegment, Test #5");
 
-        Tester.assertFalse(Geo.areParellel(notParallelLine1, notParallelLine2), "areNotParallel, Test #6");
+        Tester.assertFalse(Geo.areParallel(notParallelLine1, notParallelLine2), "areNotParallel, Test #6");
 
         /// getIntersection
         Line intersectionLine1 = new Line(new Point(-1,2), new Point(1,0));

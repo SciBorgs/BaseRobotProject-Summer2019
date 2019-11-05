@@ -8,6 +8,7 @@ public class Ray extends LineLike implements AlmostLine{
         super(p1, p2);
     }
 
+    @Override
     public boolean contains(Point p){
         Point diff1 = Geo.sub(p,       this.p1);
         Point diff2 = Geo.sub(this.p2, this.p1);
@@ -15,11 +16,17 @@ public class Ray extends LineLike implements AlmostLine{
         return this.toLine().contains(p) && correctSide;
     }
 
+    @Override
     public Point[] getBounds(){
         return new Point[]{p1};
     }
 
-    public boolean equals(Ray ray) {
-        return this.p1.equals(ray.p1) && this.contains(ray.p2);
+    @Override
+    public boolean equals(Object ray) {
+        if (this == ray){return true;}
+        if (!(ray instanceof Ray)){return false;}
+
+        Ray comparison = (Ray) ray;
+        return this.p1.equals(comparison.p1) && this.contains(comparison.p2);
     }
 }
