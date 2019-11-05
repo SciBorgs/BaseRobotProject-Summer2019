@@ -1,12 +1,13 @@
 package frc.robot.routing;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import frc.robot.Utils;
@@ -24,16 +25,16 @@ public class VisibilityGraph {
         this.vertices = vertices;
     }
 
-    public Map<Point, List<Point>> generateVisibilityGraph() {
-        Map<Point, List<Point>> visibilityGraph = new HashMap<>();
-        List<LineSegment> edges = getEdges();
+    public Map<Point, Set<Point>> generateVisibilityGraph() {
+        Map<Point, Set<Point>> visibilityGraph = new HashMap<>();
+        Set<LineSegment> edges = getEdges();
         for (Point vertex: this.vertices) {
             List<Point> subList = this.vertices.stream()
                                                .filter(v -> !v.equals(vertex))
                                                .collect(Collectors.toList());
-            subList.sort(Comparator.comparing(v -> Geo.angleBetween(vertex, (Point) v) % (2 * Math.PI))); // NOTE: This maps angleBetween's
+            subList.sort(Comparator.comparing(v -> Geo.angleBetween((Point) v, vertex) % (2 * Math.PI))); // NOTE: This maps angleBetween's
                                                                                                           // output from [-pi, pi] to [0, 180]
-            List<LineSegment> intersections = getIntersections(vertex, edges);
+            Set<LineSegment> intersections = getIntersections(vertex, edges);
             for (Point subVertex: subList) {
                 LineSegment vertexSegment = new LineSegment(vertex, subVertex);
                 if (intersections.isEmpty()){addToGraph(visibilityGraph, vertex, subVertex);} 
@@ -56,16 +57,14 @@ public class VisibilityGraph {
         return visibilityGraph;
     }
 
-    private List<LineSegment> getEdges() {
-        List<LineSegment> edges = new ArrayList<>();
+    private Set<LineSegment> getEdges() {
+        Set<LineSegment> edges = new HashSet<>();
+        Point polygonStart = null;
         for (int i = 1; i < this.vertices.size() - 1; ++i) {
             Point currentVertex = this.vertices.get(i);
-            Point polygonStart = null;
-
             if (this.vertices.get(i - 1).polygonID != currentVertex.polygonID) { // currentVertex is the starting point of the polygon
                 polygonStart = currentVertex;
             }
-
             if (this.vertices.get(i + 1).polygonID == currentVertex.polygonID) {
                 edges.add(new LineSegment(currentVertex, this.vertices.get(i + 1)));
             } else {
@@ -76,8 +75,8 @@ public class VisibilityGraph {
         return edges;
     }
 
-    private List<LineSegment> getIntersections(Point vertex, List<LineSegment> edges) {
-        List<LineSegment> intersections = new ArrayList<>();
+    private Set<LineSegment> getIntersections(Point vertex, Set<LineSegment> edges) {
+        Set<LineSegment> intersections = new HashSet<>();
         LineSegment halfLine = new LineSegment(vertex, new Point(Collections.max(this.vertices, Comparator.comparing(p -> p.x)).x, 
                                                                  vertex.y));
         for (LineSegment edge: edges) {
@@ -89,19 +88,19 @@ public class VisibilityGraph {
     private boolean isValidIntersection(LineSegment ls1, LineSegment ls2, Optional<Point> point) {
         if (point.isEmpty()){return false;}
         Point intersectionPoint = point.get();
-        return !isPointApproxVertex(ls1, intersectionPoint) && !isPointApproxVertex(ls2, intersectionPoint);
+        return !isPointApproxVertex(ls1, intersectionPoint) || !isPointApproxVertex(ls2, intersectionPoint);
     }
 
     private boolean isPointApproxVertex(LineSegment lineSegment, Point point) {
-        return (Utils.inRange(lineSegment.p1.x, point.x, Utils.EPSILON) && Utils.inRange(lineSegment.p1.y, point.y, Utils.EPSILON)) 
-           ||  (Utils.inRange(lineSegment.p2.x, point.x, Utils.EPSILON) && Utils.inRange(lineSegment.p2.y, point.y, Utils.EPSILON)); 
+      return (Utils.inRange(lineSegment.p1.x, point.x, Utils.EPSILON) && Utils.inRange(lineSegment.p1.y, point.y, Utils.EPSILON)) 
+          || (Utils.inRange(lineSegment.p2.x, point.x, Utils.EPSILON) && Utils.inRange(lineSegment.p2.y, point.y, Utils.EPSILON)); 
     }
 
-    private void addToGraph(Map<Point, List<Point>> graph, Point key, Point value) {
-        if (key.polygonID != value.polygonID){graph.computeIfAbsent(key, k -> new ArrayList<>()).add(value);}
+    private void addToGraph(Map<Point, Set<Point>> graph, Point key, Point value) {
+        if (key.polygonID != value.polygonID){graph.computeIfAbsent(key, k -> new HashSet<>()).add(value);}
     }
 
-    private void updateIntersections(List<LineSegment> intersections, Point vertex, LineSegment ls1, LineSegment ls2) {
+    private void updateIntersections(Set<LineSegment> intersections, Point vertex, LineSegment ls1, LineSegment ls2) {
         double orientation = Geo.getOrientation(vertex, ls1);
         if (orientation > 0){intersections.add(ls2);}
         else if (orientation < 0){intersections.remove(ls2);}
