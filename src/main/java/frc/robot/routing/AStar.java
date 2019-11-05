@@ -30,7 +30,7 @@ public class AStar {
         // first = g_cost; second = f_cost
         Map<Point, Pair<Double, Double>> costs = new HashMap<>();
         Set<Point> closedSet = new HashSet<>();
-        Queue<Point> queue = new PriorityQueue<>(Comparator.comparing(p -> costs.get(p).first));
+        Queue<Point> queue = new PriorityQueue<>(Comparator.comparing(p -> costs.get(p).second));
         queue.add(startPoint);
 
         while (!queue.isEmpty()) {
