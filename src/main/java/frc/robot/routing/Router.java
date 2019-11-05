@@ -8,18 +8,19 @@ import frc.robot.shapes.Point;
 
 public class Router {
     private Point startPoint, goalPoint;
-    private Map map;
+    private Field field;
 
-    public Router(Point startPoint, Point goalPoint, Map map) {
+    public Router(Point startPoint, Point goalPoint, Field field) {
         this.startPoint = startPoint;
         this.goalPoint  = goalPoint;
-        this.map = map;
+        this.field = field;
     }
 
     public List<Point> getRoute() {
         List<Point> vertices = new ArrayList<>();
         vertices.add(this.startPoint);
-        vertices.addAll(Arrays.asList(this.map.getVertices()));
+        vertices.addAll(Arrays.asList(this.field.getVertices()));
         vertices.add(this.goalPoint);
+        return new AStar(new VisibilityGraph(vertices).generateVisibilityGraph(), startPoint, goalPoint).getOptimalRoute();
     }
 }
