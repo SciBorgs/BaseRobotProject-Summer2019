@@ -28,9 +28,4 @@ public class LineSegment extends LineLike implements AlmostLine {
         return this.p1.equals(lineSegment.p1) && this.p2.equals(lineSegment.p2)
             || this.p1.equals(lineSegment.p2) && this.p2.equals(lineSegment.p1);
     }
-
-    @Override
-    public String toString() {
-        return getClass().getName() + " @ " + "P1:(" + p1.x + "," + p1.y + ") " + "P2:(" + p2.x + "," + p2.y + ")"; 
-    }
 }
