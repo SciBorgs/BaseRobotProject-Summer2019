@@ -12,6 +12,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import frc.robot.helpers.Geo;
+import frc.robot.helpers.Pair;
 import frc.robot.shapes.Point;
 
 public class AStar {
@@ -26,18 +27,20 @@ public class AStar {
 
     public List<Point> getOptimalRoute() {
         Map<Point, Point> path = new HashMap<>();
+        // first = g_cost; second = f_cost
+        Map<Point, Pair<Double, Double>> costs = new HashMap<>();
         Set<Point> closedSet = new HashSet<>();
-        Queue<Point> queue = new PriorityQueue<>(Comparator.comparing(p -> p.f));
+        Queue<Point> queue = new PriorityQueue<>(Comparator.comparing(p -> costs.get(p).first));
         queue.add(startPoint);
-        
+
         while (!queue.isEmpty()) {
             Point currentPoint = queue.poll();
             if (currentPoint.equals(goalPoint)){break;}
             closedSet.add(currentPoint);
             for (Point node: visibilityGraph.get(currentPoint)) {
-                node.g = currentPoint.g + Geo.getDistanceSquared(currentPoint, node);
-                node.f = node.g + Geo.getManhattanDistance(goalPoint, node);
-                if (contains(queue, node) || contains(closedSet, node)){continue;}
+                double g = costs.getOrDefault(currentPoint, new Pair<>(0.0, 0.0)).first + Geo.getDistanceSquared(currentPoint, node);
+                costs.put(node, new Pair<>(g, g + Geo.getManhattanDistance(goalPoint, node)));
+                if (contains(queue, node, costs) || contains(closedSet, node, costs)){continue;}
                 queue.remove(node);
                 closedSet.remove(node);
                 queue.add(node);
@@ -55,9 +58,9 @@ public class AStar {
         return pointPath;
     }
 
-    private boolean contains(Iterable<Point> points, Point comparisonPoint) {
+    private boolean contains(Iterable<Point> points, Point comparisonPoint, Map<Point, Pair<Double, Double>> costs) {
         for (Point point: points) {
-            if (point.equals(comparisonPoint) && point.f <= comparisonPoint.f){return true;}
+            if (point.equals(comparisonPoint) && costs.get(point).second <= costs.get(comparisonPoint).second){return true;}
         }
         return false;
     }
