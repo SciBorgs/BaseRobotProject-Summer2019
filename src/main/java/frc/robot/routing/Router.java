@@ -20,10 +20,9 @@ public class Router {
  
     public List<Point> getRoute() {
         List<Point> vertices = new ArrayList<>();
-        vertices.add(this.startPoint);
         vertices.addAll(getPointsFromMap());
         vertices.add(this.goalPoint);
-        return new AStar(new VisibilityGraph(vertices, Set.of(map)).generateVisibilityGraph(), startPoint, goalPoint).getOptimalRoute();
+        return new AStar(VisibilityGraph.generateVisibilityGraph(vertices, Set.of(map)), startPoint, goalPoint).getOptimalRoute();
     }
 
     private Set<Point> getPointsFromMap() {

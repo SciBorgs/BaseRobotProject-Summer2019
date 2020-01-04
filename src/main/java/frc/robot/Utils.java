@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 // FILE HAS NOT BEEN CLEANED UP //
 public class Utils{
@@ -193,6 +194,10 @@ public class Utils{
 
     public static double sumArrayList(List<Double> l){
         return l.stream().mapToDouble(a -> a).sum();
+    }
+
+    public static<T> Stream<T> iteratorToStream(Iterable<T> it) {
+        return StreamSupport.stream(it.spliterator(), false);
     }
 
     public static void addNoise(RobotState state, Hashtable<SD, Double> stdDevs){

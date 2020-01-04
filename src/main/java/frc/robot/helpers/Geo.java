@@ -131,8 +131,11 @@ public class Geo {
         return Math.abs((p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y));
     }
 
-    public static double getOrientation(Point p1, LineLike lLike) {
-        return (lLike.p2.x - lLike.p1.x) * (p1.y - lLike.p1.y) - (p1.x - lLike.p1.x) * (lLike.p2.y - lLike.p1.y);
+    // Returns a positive number if point is above or to the right of directedLS
+    // Returns a negative number if point is below or to the left  of directedLS
+    // Returns 0.0 if point is anywhere on directedLS
+    public static double getOrientation(Point p1, DirectedLineSegment directedLS) {
+        return (directedLS.p2.x - directedLS.p1.x) * (p1.y - directedLS.p1.y) - (p1.x - directedLS.p1.x) * (directedLS.p2.y - directedLS.p1.y);
     }
 
     public static boolean isPointInCircle(Point p1, Point p2, Point p3, Point pointToTest) {

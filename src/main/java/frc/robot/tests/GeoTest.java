@@ -205,6 +205,12 @@ public class GeoTest {
 
         Tester.assertEquals(Geo.getIntersection(intersectionSegment1, intersectionSegment2).get(), new Point(2,1), "getIntersection, Test #6");
 
+        /// getOrientation
+        DirectedLineSegment ls = new DirectedLineSegment(new Point(-5,0), new Point(5,0));
+        Tester.assertTrue(Geo.getOrientation(new Point(0,5),  ls) >  0, "getOrientatoin, Test # 1");
+        Tester.assertTrue(Geo.getOrientation(new Point(0,-5), ls) <  0, "getOrientatoin, Test # 2");
+        Tester.assertTrue(Geo.getOrientation(new Point(5,0),  ls) == 0, "getOrientation, Test # 3");
+
         /// Scale point
         Tester.assertEquals(Geo.scale(new Point(4,2), 3),   new Point(12,6),   "scale, Test #1");
         Tester.assertEquals(Geo.scale(new Point(-3,-5), 2), new Point(-6,-10), "scale, Test #1");

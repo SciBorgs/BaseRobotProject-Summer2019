@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import frc.robot.Utils;
 import frc.robot.helpers.Geo;
 import frc.robot.helpers.Pair;
 import frc.robot.shapes.Point;
@@ -40,11 +41,12 @@ public class AStar {
             for (Point node: visibilityGraph.get(currentPoint)) {
                 double g = costs.getOrDefault(currentPoint, new Pair<>(0.0, 0.0)).first + Geo.getDistanceSquared(currentPoint, node);
                 costs.put(node, new Pair<>(g, g + Geo.getManhattanDistance(goalPoint, node)));
-                if (contains(queue, node, costs) || contains(closedSet, node, costs)){continue;}
-                queue.remove(node);
-                closedSet.remove(node);
-                queue.add(node);
-                path.put(node, currentPoint);
+                if (!contains(queue, node, costs) && !contains(closedSet, node, costs)) {
+                    queue.remove(node);
+                    closedSet.remove(node);
+                    queue.add(node);
+                    path.put(node, currentPoint);
+                }
             }
         }
         List<Point> pointPath = new ArrayList<>();
@@ -53,15 +55,11 @@ public class AStar {
             pointPath.add(currentPoint);
             currentPoint = path.get(currentPoint);
         }
-        pointPath.add(startPoint);
         Collections.reverse(pointPath);
         return pointPath;
     }
 
     private boolean contains(Iterable<Point> points, Point comparisonPoint, Map<Point, Pair<Double, Double>> costs) {
-        for (Point point: points) {
-            if (point.equals(comparisonPoint) && costs.get(point).second <= costs.get(comparisonPoint).second){return true;}
-        }
-        return false;
+        return Utils.iteratorToStream(points).anyMatch(p -> p.equals(comparisonPoint) && costs.get(p).second <= costs.get(comparisonPoint).second);
     }
 }
